@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siemens 7UM621 Overvoltage Protection Simulator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --siemens-blue: #009999;
+            --siemens-dark-blue: #00617F;
+            --siemens-light-blue: #6AD1E0;
+            --siemens-gray: #E5E5E5;
+            --siemens-dark-gray: #333333;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            color: var(--siemens-dark-gray);
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--siemens-blue), var(--siemens-dark-blue));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 0;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            background: linear-gradient(to right, var(--siemens-blue), var(--siemens-dark-blue));
+            color: white;
+            padding: 1.2rem 1.5rem;
+            margin: 0;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .settings-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .settings-table th, .settings-table td {
+            border: 1px solid var(--siemens-gray);
+            padding: 12px 15px;
+            text-align: left;
+        }
+        
+        .settings-table th {
+            background-color: var(--siemens-light-blue);
+            font-weight: 600;
+        }
+        
+        .settings-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .editable-cell {
+            position: relative;
+        }
+        
+        .editable-cell input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .simulation-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 900px) {
+            .simulation-area {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .input-section, .results-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--siemens-dark-blue);
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        input[type="number"]:focus, select:focus {
+            border-color: var(--siemens-blue);
+            box-shadow: 0 0 0 3px rgba(0, 153, 153, 0.2);
+            outline: none;
+        }
+        
+        .input-with-unit {
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-with-unit input {
+            flex: 1;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .unit {
+            background-color: var(--siemens-gray);
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-left: none;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .percentage-slider {
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+        
+        .slider-value {
+            text-align: center;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            color: var(--siemens-dark-blue);
+        }
+        
+        button {
+            background: linear-gradient(to right, var(--siemens-blue), var(--siemens-dark-blue));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        button:hover {
+            background: linear-gradient(to right, var(--siemens-dark-blue), var(--siemens-blue));
+            box-shadow: 0 4px 12px rgba(0, 97, 127, 0.3);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-active {
+            background-color: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-inactive {
+            background-color: #28a745;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .trip-alert {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .warning-alert {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .normal-alert {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .equation {
+            background-color: #f5f5f5;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid var(--siemens-blue);
+            font-family: 'Courier New', monospace;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .calculation-results {
+            margin-top: 1.5rem;
+        }
+        
+        .calculation-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .calculation-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        footer {
+            background-color: var(--siemens-dark-gray);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .copyright {
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-box {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 5px solid var(--siemens-blue);
+        }
+        
+        .summary-box.trip {
+            background: linear-gradient(135deg, #ffebee, #fce4ec);
+            border-left: 5px solid #f44336;
+        }
+        
+        .summary-box.warning {
+            background: linear-gradient(135deg, #fff3e0, #fbe9e7);
+            border-left: 5px solid #ff9800;
+        }
+        
+        .summary-box.normal {
+            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+            border-left: 5px solid #4caf50;
+        }
+        
+        .credits {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .credits a {
+            color: var(--siemens-light-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+        
+        .credits a:hover {
+            color: white;
+        }
+        
+        .protection-status {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+        }
+        
+        .status-card {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .status-card.active {
+            background-color: #ffebee;
+            border: 2px solid #f44336;
+            box-shadow: 0 4px 8px rgba(244, 67, 54, 0.2);
+        }
+        
+        .status-card.inactive {
+            background-color: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+        
+        .status-card.pending {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+        }
+        
+        .status-indicator-large {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin: 0 auto 0.5rem;
+        }
+        
+        .time-delay-visualization {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .delay-progress {
+            margin: 1rem 0;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--siemens-blue), var(--siemens-dark-blue));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .action-buttons button {
+            flex: 1;
+            margin-top: 0;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #6c757d, #495057);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(to right, #495057, #6c757d);
+        }
+        
+        .voltage-mode-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .voltage-mode {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem;
+            border: 2px solid var(--siemens-gray);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .voltage-mode.active {
+            border-color: var(--siemens-blue);
+            background-color: rgba(0, 153, 153, 0.1);
+        }
+        
+        .voltage-mode i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--siemens-blue);
+        }
+        
+        .ramp-controls {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .ramp-controls.active {
+            display: block;
+        }
+        
+        .ramp-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .ramp-input-group .input-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .ramp-visualization {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ramp-chart-container {
+            position: relative;
+            height: 200px;
+            margin: 1rem 0;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .ramp-chart {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .ramp-current-position {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--siemens-blue);
+            z-index: 10;
+        }
+        
+        .ramp-current-value {
+            position: absolute;
+            background-color: var(--siemens-blue);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            transform: translateX(-50%);
+            z-index: 11;
+        }
+        
+        .ramp-time-markers {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .ramp-controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .ramp-time-control {
+            grid-column: 1 / -1;
+        }
+        
+        .ramp-slider-container {
+            position: relative;
+            margin-top: 0.5rem;
+        }
+        
+        .ramp-slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .ramp-play-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .ramp-play-controls button {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-play {
+            background: linear-gradient(to right, #28a745, #20c997);
+        }
+        
+        .btn-play:hover {
+            background: linear-gradient(to right, #20c997, #28a745);
+        }
+        
+        .btn-pause {
+            background: linear-gradient(to right, #ffc107, #fd7e14);
+        }
+        
+        .btn-pause:hover {
+            background: linear-gradient(to right, #fd7e14, #ffc107);
+        }
+        
+        .btn-stop {
+            background: linear-gradient(to right, #dc3545, #c82333);
+        }
+        
+        .btn-stop:hover {
+            background: linear-gradient(to right, #c82333, #dc3545);
+        }
+        
+        .timer-container {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .timer {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .timer-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .timer-icon.u-stage {
+            background-color: #ff9800;
+        }
+        
+        .timer-icon.uu-stage {
+            background-color: #f44336;
+        }
+        
+        .timer-icon.inactive {
+            background-color: #9e9e9e;
+        }
+        
+        .timer-info {
+            flex: 1;
+        }
+        
+        .timer-label {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .timer-progress {
+            height: 6px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+        
+        .timer-progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .timer-progress-bar.u-stage {
+            background-color: #ff9800;
+        }
+        
+        .timer-progress-bar.uu-stage {
+            background-color: #f44336;
+        }
+        
+        .timer-time {
+            font-size: 0.9rem;
+            color: #666;
+            display: none; /* Hide the countdown numbers */
+        }
+        
+        .timer-status {
+            font-weight: 600;
+            text-align: right;
+            min-width: 100px;
+        }
+        
+        .timer-status.pickup {
+            color: #ff9800;
+        }
+        
+        .timer-status.counting {
+            color: #2196f3;
+        }
+        
+        .timer-status.tripped {
+            color: #f44336;
+        }
+        
+        .timer-status.inactive {
+            color: #9e9e9e;
+        }
+        
+        .trip-command {
+            background-color: #ffebee;
+            border: 2px solid #f44336;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            animation: pulse-alert 1.5s infinite;
+        }
+        
+        @keyframes pulse-alert {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+        }
+        
+        .trip-command h4 {
+            color: #f44336;
+            margin-bottom: 0.5rem;
+        }
+        
+        .trip-command p {
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .settings-table {
+                font-size: 0.85rem;
+            }
+            
+            .settings-table th, .settings-table td {
+                padding: 8px 10px;
+            }
+            
+            .simulation-area {
+                gap: 1rem;
+            }
+            
+            .input-group {
+                margin-bottom: 1rem;
+            }
+            
+            .protection-status {
+                flex-direction: column;
+            }
+            
+            .status-card {
+                margin: 0.5rem 0;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .ramp-input-group {
+                flex-direction: column;
+            }
+            
+            .ramp-controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <h1>7UM621 Overvoltage Protection (ANSI 59)</h1>
+            </div>
+            <p class="subtitle">Simulation and Configuration Tool</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>Introduction</h2>
+            </div>
+            <div class="card-body">
+                <p>Overvoltage protection serves to protect the electrical machine and connected electrical plant components from the effects of inadmissible voltage increases. Overvoltages can be caused by:</p>
+                <ul style="margin: 1rem 0 1rem 2rem;">
+                    <li>Incorrect manual operation of the excitation system</li>
+                    <li>Faulty operation of the automatic voltage regulator</li>
+                    <li>Full load shedding of a generator</li>
+                    <li>Separation of the generator from the system</li>
+                    <li>Island operation</li>
+                </ul>
+                <p>The <strong>overvoltage protection</strong> for medium voltage generators monitors the phase-to-phase voltages. In case of a high overvoltage, trip is performed with a short-time delay, whereas in case of less severe overvoltages, the trip is performed with a longer time delay.</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>System Configuration</h2>
+            </div>
+            <div class="card-body">
+                <table class="settings-table" id="system-config-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Value</th>
+                            <th>Unit</th>
+                            <th>Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>U<sub>SM</sub></td>
+                            <td class="editable-cell">
+                                <input type="number" id="usm-value" min="1" max="50" step="0.01" value="15.75">
+                            </td>
+                            <td>kV</td>
+                            <td>Nominal machine voltage</td>
+                        </tr>
+                        <tr>
+                            <td>U<sub>NVT prim</sub></td>
+                            <td class="editable-cell">
+                                <input type="number" id="unvt-prim" min="1000" max="50000" step="1" value="15700">
+                            </td>
+                            <td>V</td>
+                            <td>VT Primary Voltage</td>
+                        </tr>
+                        <tr>
+                            <td>U<sub>NVT sec</sub></td>
+                            <td class="editable-cell">
+                                <input type="number" id="unvt-sec" min="50" max="200" step="1" value="110">
+                            </td>
+                            <td>V</td>
+                            <td>VT Secondary Voltage</td>
+                        </tr>
+                        <tr>
+                            <td>ΔU<sub>SM</sub></td>
+                            <td class="editable-cell">
+                                <input type="number" id="delta-usm" min="1" max="20" step="0.1" value="5">
+                            </td>
+                            <td>%</td>
+                            <td>Positive nominal machine voltage tolerance</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3 style="margin-top: 1.5rem; color: var(--siemens-dark-blue);">Protection Settings</h3>
+                <table class="settings-table" id="protection-settings-table">
+                    <thead>
+                        <tr>
+                            <th>Address</th>
+                            <th>Parameter</th>
+                            <th>Setting Options</th>
+                            <th>Setting</th>
+                            <th>Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>4101</td>
+                            <td>OVERVOLTAGE</td>
+                            <td>OFF / ON / Block unity</td>
+                            <td>
+                                <select id="overvoltage-setting">
+                                    <option value="ON">ON</option>
+                                    <option value="OFF">OFF</option>
+                                    <option value="BLOCK">Block unity</option>
+                                </select>
+                            </td>
+                            <td>Overvoltage Protection</td>
+                        </tr>
+                        <tr>
+                            <td>4102</td>
+                            <td>U></td>
+                            <td>30.0 - 170.0 V</td>
+                            <td class="editable-cell">
+                                <input type="number" id="u-pickup-setting" min="30" max="170" step="0.1" value="116.0">
+                            </td>
+                            <td>U> Pickup</td>
+                        </tr>
+                        <tr>
+                            <td>4103</td>
+                            <td>T U></td>
+                            <td>0.00 - 60.0 s</td>
+                            <td class="editable-cell">
+                                <input type="number" id="tu-delay-setting" min="0" max="60" step="0.01" value="3.00">
+                            </td>
+                            <td>T U> Time Delay</td>
+                        </tr>
+                        <tr>
+                            <td>4104</td>
+                            <td>U>></td>
+                            <td>30.0 - 170.0 V</td>
+                            <td class="editable-cell">
+                                <input type="number" id="uu-pickup-setting" min="30" max="170" step="0.1" value="136.0">
+                            </td>
+                            <td>U>> Pickup</td>
+                        </tr>
+                        <tr>
+                            <td>4105</td>
+                            <td>T U>></td>
+                            <td>0.00 - 60.0 s</td>
+                            <td class="editable-cell">
+                                <input type="number" id="tuu-delay-setting" min="0" max="60" step="0.01" value="0.75">
+                            </td>
+                            <td>T U>> Time Delay</td>
+                        </tr>
+                        <tr>
+                            <td>4106A</td>
+                            <td>DOUT RATIO</td>
+                            <td>0.90 - 0.99</td>
+                            <td class="editable-cell">
+                                <input type="number" id="dout-ratio" min="0.90" max="0.99" step="0.01" value="0.95">
+                            </td>
+                            <td>U>, U>> Drop Out Ratio</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="simulation-area">
+            <div class="input-section">
+                <h3 style="color: var(--siemens-dark-blue); margin-bottom: 1.5rem;">Simulation Inputs</h3>
+                
+                <!-- Voltage Mode Selector -->
+                <div class="input-group">
+                    <label>Voltage Change Mode:</label>
+                    <div class="voltage-mode-selector">
+                        <div class="voltage-mode active" id="steady-mode">
+                            <i class="fas fa-chart-line"></i>
+                            <div>Steady Voltage</div>
+                        </div>
+                        <div class="voltage-mode" id="ramp-mode">
+                            <i class="fas fa-sliders-h"></i>
+                            <div>Ramp Voltage</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Steady Voltage Controls -->
+                <div id="steady-controls">
+                    <div class="input-group">
+                        <label for="voltage-percentage">Voltage Percentage (% of U<sub>n</sub>):</label>
+                        <input type="number" id="voltage-percentage" min="80" max="150" step="0.1" value="100">
+                        <div class="slider-value" id="voltage-percentage-value">100% (110.0 V)</div>
+                        <input type="range" id="voltage-slider" min="80" max="150" step="0.1" value="100" class="percentage-slider">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="voltage-secondary">Measured Voltage (V secondary):</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="voltage-secondary" min="88" max="165" step="0.1" value="110.0">
+                            <span class="unit">V</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ramp Voltage Controls -->
+                <div class="ramp-controls" id="ramp-controls">
+                    <div class="ramp-controls-grid">
+                        <div class="input-group">
+                            <label for="ramp-start-voltage">Start Voltage (V):</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="ramp-start-voltage" min="88" max="165" step="0.1" value="110.0">
+                                <span class="unit">V</span>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="ramp-end-voltage">End Voltage (V):</label>
+                            <div class="input-with-unit">
+                                <input type="number" id="ramp-end-voltage" min="88" max="165" step="0.1" value="130.0">
+                                <span class="unit">V</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="ramp-duration">Ramp Duration (s):</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="ramp-duration" min="0.1" max="60" step="0.1" value="5.0">
+                            <span class="unit">s</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Ramp Visualization -->
+                    <div class="ramp-visualization">
+                        <h4>Ramp Visualization</h4>
+                        <div class="ramp-chart-container">
+                            <canvas class="ramp-chart" id="ramp-chart"></canvas>
+                            <div class="ramp-current-position" id="ramp-current-position"></div>
+                            <div class="ramp-current-value" id="ramp-current-value">110.0 V</div>
+                        </div>
+                        <div class="ramp-time-markers">
+                            <span>0 s</span>
+                            <span id="ramp-mid-time">2.5 s</span>
+                            <span id="ramp-end-time">5.0 s</span>
+                        </div>
+                        
+                        <div class="input-group ramp-time-control">
+                            <label for="ramp-current-time">Current Time (s):</label>
+                            <div class="ramp-slider-container">
+                                <input type="range" id="ramp-time-slider" min="0" max="60" step="0.1" value="0" class="percentage-slider">
+                                <div class="ramp-slider-labels">
+                                    <span>0 s</span>
+                                    <span id="ramp-slider-mid">2.5 s</span>
+                                    <span id="ramp-slider-max">5.0 s</span>
+                                </div>
+                            </div>
+                            <div class="input-with-unit">
+                                <input type="number" id="ramp-current-time" min="0" max="60" step="0.1" value="0">
+                                <span class="unit">s</span>
+                            </div>
+                        </div>
+                        
+                        <div class="ramp-play-controls">
+                            <button id="ramp-play-btn" class="btn-play">
+                                <i class="fas fa-play"></i> Play
+                            </button>
+                            <button id="ramp-pause-btn" class="btn-pause">
+                                <i class="fas fa-pause"></i> Pause
+                            </button>
+                            <button id="ramp-stop-btn" class="btn-stop">
+                                <i class="fas fa-stop"></i> Stop
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="u-pickup-percentage">U> Pickup Setting (% of U<sub>n</sub>):</label>
+                    <input type="number" id="u-pickup-percentage" min="100" max="130" step="0.1" value="115">
+                    <div class="slider-value" id="u-pickup-value">115% (126.5 V)</div>
+                    <input type="range" id="u-pickup-slider" min="100" max="130" step="0.1" value="115" class="percentage-slider">
+                </div>
+                
+                <div class="input-group">
+                    <label for="uu-pickup-percentage">U>> Pickup Setting (% of U<sub>n</sub>):</label>
+                    <input type="number" id="uu-pickup-percentage" min="110" max="150" step="0.1" value="130">
+                    <div class="slider-value" id="uu-pickup-value">130% (143.0 V)</div>
+                    <input type="range" id="uu-pickup-slider" min="110" max="150" step="0.1" value="130" class="percentage-slider">
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="simulate-btn">Run Simulation</button>
+                    <button id="reset-btn" class="btn-secondary">Reset</button>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <h3 style="color: var(--siemens-dark-blue); margin-bottom: 1.5rem;">Simulation Results</h3>
+                
+                <!-- Protection Status Cards -->
+                <div class="protection-status" id="protection-status">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                
+                <!-- Timer Container -->
+                <div class="timer-container" id="timer-container">
+                    <h4>Protection Stage Timers</h4>
+                    <div class="timer" id="u-stage-timer">
+                        <div class="timer-icon u-stage inactive">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="timer-info">
+                            <div class="timer-label">U> Stage (Long-time)</div>
+                            <div class="timer-progress">
+                                <div class="timer-progress-bar u-stage" style="width: 0%"></div>
+                            </div>
+                            <!-- Removed countdown numbers -->
+                        </div>
+                        <div class="timer-status inactive">INACTIVE</div>
+                    </div>
+                    
+                    <div class="timer" id="uu-stage-timer">
+                        <div class="timer-icon uu-stage inactive">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="timer-info">
+                            <div class="timer-label">U>> Stage (Short-time)</div>
+                            <div class="timer-progress">
+                                <div class="timer-progress-bar uu-stage" style="width: 0%"></div>
+                            </div>
+                            <!-- Removed countdown numbers -->
+                        </div>
+                        <div class="timer-status inactive">INACTIVE</div>
+                    </div>
+                </div>
+                
+                <!-- Trip Command Display -->
+                <div id="trip-command-container" style="display: none;">
+                    <!-- Will be populated when trip command is issued -->
+                </div>
+                
+                <div id="results-container">
+                    <div class="normal-alert">
+                        <p>Enter parameters and run simulation to see results.</p>
+                    </div>
+                </div>
+                
+                <!-- Time Delay Visualization -->
+                <div class="time-delay-visualization" id="time-delay-visualization">
+                    <h4>Time Delay Progress</h4>
+                    <div class="delay-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="u-progress"></div>
+                        </div>
+                        <span>U> Stage (3.00s)</span>
+                    </div>
+                    <div class="delay-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="uu-progress"></div>
+                        </div>
+                        <span>U>> Stage (0.75s)</span>
+                    </div>
+                </div>
+                
+                <div class="calculation-results">
+                    <h4 style="color: var(--siemens-dark-blue); margin-bottom: 1rem;">Calculations</h4>
+                    
+                    <div class="calculation-item">
+                        <h5>U> Stage Calculation</h5>
+                        <div class="equation" id="u-stage-calculation">
+                            U> = (1.15 × U<sub>SM</sub> × U<sub>NVT sec</sub>) / U<sub>NVT prim</sub><br>
+                            U> = (1.15 × 15.75 kV × 110 V) / 15700 V = 127.1 V secondary
+                        </div>
+                    </div>
+                    
+                    <div class="calculation-item">
+                        <h5>U>> Stage Calculation</h5>
+                        <div class="equation" id="uu-stage-calculation">
+                            U>> = (1.30 × U<sub>SM</sub> × U<sub>NVT sec</sub>) / U<sub>NVT prim</sub><br>
+                            U>> = (1.30 × 15.75 kV × 110 V) / 15700 V = 143.7 V secondary
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>Protection Operation Description</h2>
+            </div>
+            <div class="card-body">
+                <p>The setting of limit values and time delays of the <strong>overvoltage protection</strong> depends on the speed with which the voltage regulator can control voltage variations. The protection must not intervene in the regulation process of the faultlessly functioning voltage regulator. For this reason, the two-stage characteristic is set always above the voltage time characteristic of the regulation procedure.</p>
+                
+                <p>The long-time stage 4102 <strong>U></strong> and 4103 <strong>T U></strong> must intervene in case of steady-state <strong>overvoltages</strong>. Depending on the generator voltage tolerance it is set to a value between 115 % to 120 % U<sub>s</sub> with a time delay of 3s.</p>
+                
+                <p>In case of a full-load rejection of the generator, the voltage increases first in relation to the transient voltage. Only then the voltage regulator reduces it again to its nominal value. The <strong>U>></strong> stage is set generally as a short-time stage in a way that the transient procedure for a full-load rejection does not lead to a tripping. For example, for 4104 <strong>U>></strong> about 130 % to 135 % U<sub>s</sub> with a delay 4105 <strong>T U>></strong> of 0.75s.</p>
+                
+                <p>The dropout ratio can be adapted at the address 4106A <strong>DOUT RATIO</strong> in small stages to the operating conditions and used for highly precise signalizations.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <p class="copyright">Siemens 7UM621 Overvoltage Protection Simulator | For educational and training purposes</p>
+            <p>Based on Siemens operational manual and technical documentation</p>
+            <div class="credits">
+                <span>Developed by <strong>Eng: Alaa Adnan</strong></span>
+                <a href="https://youtube.com/@alaaelectric93?si=b6sDyjIvC7GeJk2X" target="_blank">
+                    <i class="fab fa-youtube"></i> YouTube Channel
+                </a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Constants
+        let NOMINAL_VOLTAGE = 110; // V secondary
+        let UNVT_PRIM = 15700; // V primary
+        let UNVT_SEC = 110; // V secondary
+        let USM = 15.75; // kV
+        
+        // DOM Elements
+        const voltagePercentageInput = document.getElementById('voltage-percentage');
+        const voltageSlider = document.getElementById('voltage-slider');
+        const voltagePercentageValue = document.getElementById('voltage-percentage-value');
+        const voltageSecondaryInput = document.getElementById('voltage-secondary');
+        
+        const uPickupPercentageInput = document.getElementById('u-pickup-percentage');
+        const uPickupSlider = document.getElementById('u-pickup-slider');
+        const uPickupValue = document.getElementById('u-pickup-value');
+        
+        const uuPickupPercentageInput = document.getElementById('uu-pickup-percentage');
+        const uuPickupSlider = document.getElementById('uu-pickup-slider');
+        const uuPickupValue = document.getElementById('uu-pickup-value');
+        
+        const simulateBtn = document.getElementById('simulate-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const resultsContainer = document.getElementById('results-container');
+        const protectionStatusContainer = document.getElementById('protection-status');
+        const timeDelayVisualization = document.getElementById('time-delay-visualization');
+        
+        // System Configuration Inputs
+        const usmInput = document.getElementById('usm-value');
+        const unvtPrimInput = document.getElementById('unvt-prim');
+        const unvtSecInput = document.getElementById('unvt-sec');
+        const deltaUsmInput = document.getElementById('delta-usm');
+        
+        // Protection Settings Inputs
+        const overvoltageSetting = document.getElementById('overvoltage-setting');
+        const uPickupSetting = document.getElementById('u-pickup-setting');
+        const tuDelaySetting = document.getElementById('tu-delay-setting');
+        const uuPickupSetting = document.getElementById('uu-pickup-setting');
+        const tuuDelaySetting = document.getElementById('tuu-delay-setting');
+        const doutRatio = document.getElementById('dout-ratio');
+        
+        // Voltage Mode Elements
+        const steadyMode = document.getElementById('steady-mode');
+        const rampMode = document.getElementById('ramp-mode');
+        const steadyControls = document.getElementById('steady-controls');
+        const rampControls = document.getElementById('ramp-controls');
+        
+        // Ramp Voltage Elements
+        const rampStartVoltageInput = document.getElementById('ramp-start-voltage');
+        const rampEndVoltageInput = document.getElementById('ramp-end-voltage');
+        const rampDurationInput = document.getElementById('ramp-duration');
+        const rampCurrentTimeInput = document.getElementById('ramp-current-time');
+        const rampTimeSlider = document.getElementById('ramp-time-slider');
+        
+        // Ramp Visualization Elements
+        const rampChartCanvas = document.getElementById('ramp-chart');
+        const rampCurrentPosition = document.getElementById('ramp-current-position');
+        const rampCurrentValue = document.getElementById('ramp-current-value');
+        const rampMidTime = document.getElementById('ramp-mid-time');
+        const rampEndTime = document.getElementById('ramp-end-time');
+        const rampSliderMid = document.getElementById('ramp-slider-mid');
+        const rampSliderMax = document.getElementById('ramp-slider-max');
+        
+        // Ramp Play Controls
+        const rampPlayBtn = document.getElementById('ramp-play-btn');
+        const rampPauseBtn = document.getElementById('ramp-pause-btn');
+        const rampStopBtn = document.getElementById('ramp-stop-btn');
+        
+        // Current voltage mode
+        let currentVoltageMode = 'steady';
+        
+        // Ramp animation variables
+        let rampAnimationId = null;
+        let rampIsPlaying = false;
+        let rampStartTime = 0;
+        let rampAnimationStartTime = 0;
+        
+        // Chart context
+        let rampChartCtx = null;
+        
+        // Timer variables
+        let uStageTimerInterval = null;
+        let uuStageTimerInterval = null;
+        let uStageStartTime = 0;
+        let uuStageStartTime = 0;
+        let tripCommandIssued = false;
+        
+        // Initialize the simulator
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSystemConstants();
+            updateVoltageFromPercentage();
+            updateUPickupFromPercentage();
+            updateUUPickupFromPercentage();
+            setupVoltageModeSelector();
+            initializeRampChart();
+            initializeTimers();
+            runSimulation();
+        });
+        
+        // Setup voltage mode selector
+        function setupVoltageModeSelector() {
+            steadyMode.addEventListener('click', function() {
+                setVoltageMode('steady');
+            });
+            
+            rampMode.addEventListener('click', function() {
+                setVoltageMode('ramp');
+            });
+            
+            // Update ramp voltage when inputs change
+            rampStartVoltageInput.addEventListener('input', function() {
+                updateRampVisualization();
+                updateRampVoltage();
+            });
+            rampEndVoltageInput.addEventListener('input', function() {
+                updateRampVisualization();
+                updateRampVoltage();
+            });
+            rampDurationInput.addEventListener('input', function() {
+                updateRampVisualization();
+                updateRampVoltage();
+            });
+            rampCurrentTimeInput.addEventListener('input', function() {
+                rampTimeSlider.value = this.value;
+                updateRampVisualization();
+                updateRampVoltage();
+            });
+            rampTimeSlider.addEventListener('input', function() {
+                rampCurrentTimeInput.value = this.value;
+                updateRampVisualization();
+                updateRampVoltage();
+            });
+            
+            // Ramp play controls
+            rampPlayBtn.addEventListener('click', startRampAnimation);
+            rampPauseBtn.addEventListener('click', pauseRampAnimation);
+            rampStopBtn.addEventListener('click', stopRampAnimation);
+        }
+        
+        // Initialize ramp chart
+        function initializeRampChart() {
+            rampChartCtx = rampChartCanvas.getContext('2d');
+            updateRampVisualization();
+        }
+        
+        // Update ramp visualization
+        function updateRampVisualization() {
+            const startVoltage = parseFloat(rampStartVoltageInput.value);
+            const endVoltage = parseFloat(rampEndVoltageInput.value);
+            const duration = parseFloat(rampDurationInput.value);
+            const currentTime = parseFloat(rampCurrentTimeInput.value);
+            
+            // Update time labels
+            const midTime = duration / 2;
+            rampMidTime.textContent = `${midTime.toFixed(1)} s`;
+            rampEndTime.textContent = `${duration.toFixed(1)} s`;
+            rampSliderMid.textContent = `${midTime.toFixed(1)} s`;
+            rampSliderMax.textContent = `${duration.toFixed(1)} s`;
+            
+            // Update slider max value
+            rampTimeSlider.max = duration;
+            
+            // Calculate current position percentage
+            const positionPercent = Math.min((currentTime / duration) * 100, 100);
+            rampCurrentPosition.style.left = `${positionPercent}%`;
+            
+            // Calculate current voltage
+            let currentVoltage;
+            if (currentTime >= duration) {
+                currentVoltage = endVoltage;
+            } else {
+                currentVoltage = startVoltage + (endVoltage - startVoltage) * (currentTime / duration);
+            }
+            
+            // Update current value display
+            rampCurrentValue.textContent = `${currentVoltage.toFixed(1)} V`;
+            rampCurrentValue.style.left = `${positionPercent}%`;
+            rampCurrentValue.style.top = '10px';
+            
+            // Draw the chart
+            drawRampChart(startVoltage, endVoltage, duration, currentTime);
+        }
+        
+        // Draw ramp chart
+        function drawRampChart(startVoltage, endVoltage, duration, currentTime) {
+            const canvas = rampChartCanvas;
+            const ctx = rampChartCtx;
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Calculate min and max voltage for scaling
+            const minVoltage = Math.min(startVoltage, endVoltage, 88, 165);
+            const maxVoltage = Math.max(startVoltage, endVoltage, 88, 165);
+            const voltageRange = maxVoltage - minVoltage;
+            
+            // Draw grid
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            
+            // Horizontal grid lines (voltage)
+            for (let i = 0; i <= 5; i++) {
+                const y = height - (i * height / 5);
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+            }
+            
+            // Vertical grid lines (time)
+            for (let i = 0; i <= 5; i++) {
+                const x = i * width / 5;
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+            }
+            
+            ctx.stroke();
+            
+            // Draw axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, height);
+            ctx.lineTo(width, height); // X-axis
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, height); // Y-axis
+            ctx.stroke();
+            
+            // Draw axis labels
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            
+            // X-axis labels (time)
+            for (let i = 0; i <= 5; i++) {
+                const x = i * width / 5;
+                const time = (i * duration / 5).toFixed(1);
+                ctx.fillText(time + 's', x, height - 5);
+            }
+            
+            // Y-axis labels (voltage)
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const y = height - (i * height / 5);
+                const voltage = (minVoltage + i * voltageRange / 5).toFixed(1);
+                ctx.fillText(voltage + 'V', -5, y + 4);
+            }
+            
+            // Draw ramp line
+            ctx.strokeStyle = '#009999';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            for (let x = 0; x <= width; x++) {
+                const time = (x / width) * duration;
+                let voltage;
+                if (time >= duration) {
+                    voltage = endVoltage;
+                } else {
+                    voltage = startVoltage + (endVoltage - startVoltage) * (time / duration);
+                }
+                
+                const y = height - ((voltage - minVoltage) / voltageRange) * height;
+                
+                if (x === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            
+            ctx.stroke();
+            
+            // Draw current position marker
+            if (currentTime <= duration) {
+                const x = (currentTime / duration) * width;
+                const currentVoltage = startVoltage + (endVoltage - startVoltage) * (currentTime / duration);
+                const y = height - ((currentVoltage - minVoltage) / voltageRange) * height;
+                
+                // Draw marker
+                ctx.fillStyle = '#f44336';
+                ctx.beginPath();
+                ctx.arc(x, y, 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw vertical line to x-axis
+                ctx.strokeStyle = '#f44336';
+                ctx.setLineDash([5, 5]);
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+            
+            // Draw pickup levels
+            const uPickup = parseFloat(uPickupSetting.value);
+            const uuPickup = parseFloat(uuPickupSetting.value);
+            
+            // U> pickup line
+            if (uPickup >= minVoltage && uPickup <= maxVoltage) {
+                const y = height - ((uPickup - minVoltage) / voltageRange) * height;
+                
+                ctx.strokeStyle = '#ff9800';
+                ctx.setLineDash([5, 3]);
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#ff9800';
+                ctx.textAlign = 'left';
+                ctx.fillText('U> Pickup', 5, y - 5);
+            }
+            
+            // U>> pickup line
+            if (uuPickup >= minVoltage && uuPickup <= maxVoltage) {
+                const y = height - ((uuPickup - minVoltage) / voltageRange) * height;
+                
+                ctx.strokeStyle = '#f44336';
+                ctx.setLineDash([5, 3]);
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#f44336';
+                ctx.textAlign = 'left';
+                ctx.fillText('U>> Pickup', 5, y - 5);
+            }
+            
+            ctx.setLineDash([]);
+        }
+        
+        // Set voltage mode (steady or ramp)
+        function setVoltageMode(mode) {
+            currentVoltageMode = mode;
+            
+            if (mode === 'steady') {
+                steadyMode.classList.add('active');
+                rampMode.classList.remove('active');
+                steadyControls.style.display = 'block';
+                rampControls.classList.remove('active');
+                
+                // Stop any running animation
+                stopRampAnimation();
+            } else {
+                steadyMode.classList.remove('active');
+                rampMode.classList.add('active');
+                steadyControls.style.display = 'none';
+                rampControls.classList.add('active');
+                updateRampVisualization();
+                updateRampVoltage();
+            }
+            
+            runSimulation();
+        }
+        
+        // Start ramp animation
+        function startRampAnimation() {
+            if (rampIsPlaying) return;
+            
+            rampIsPlaying = true;
+            rampStartTime = parseFloat(rampCurrentTimeInput.value);
+            rampAnimationStartTime = Date.now();
+            
+            function animate() {
+                if (!rampIsPlaying) return;
+                
+                const currentTime = rampStartTime + (Date.now() - rampAnimationStartTime) / 1000;
+                const duration = parseFloat(rampDurationInput.value);
+                
+                if (currentTime >= duration) {
+                    rampCurrentTimeInput.value = duration;
+                    stopRampAnimation();
+                } else {
+                    rampCurrentTimeInput.value = currentTime.toFixed(1);
+                }
+                
+                rampTimeSlider.value = rampCurrentTimeInput.value;
+                updateRampVisualization();
+                updateRampVoltage();
+                
+                rampAnimationId = requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+        
+        // Pause ramp animation
+        function pauseRampAnimation() {
+            rampIsPlaying = false;
+            if (rampAnimationId) {
+                cancelAnimationFrame(rampAnimationId);
+                rampAnimationId = null;
+            }
+        }
+        
+        // Stop ramp animation
+        function stopRampAnimation() {
+            rampIsPlaying = false;
+            if (rampAnimationId) {
+                cancelAnimationFrame(rampAnimationId);
+                rampAnimationId = null;
+            }
+            
+            rampCurrentTimeInput.value = 0;
+            rampTimeSlider.value = 0;
+            updateRampVisualization();
+            updateRampVoltage();
+        }
+        
+        // Calculate and update ramp voltage
+        function updateRampVoltage() {
+            const startVoltage = parseFloat(rampStartVoltageInput.value);
+            const endVoltage = parseFloat(rampEndVoltageInput.value);
+            const duration = parseFloat(rampDurationInput.value);
+            const currentTime = parseFloat(rampCurrentTimeInput.value);
+            
+            // Calculate current voltage based on linear ramp
+            let currentVoltage;
+            if (currentTime >= duration) {
+                currentVoltage = endVoltage;
+            } else {
+                currentVoltage = startVoltage + (endVoltage - startVoltage) * (currentTime / duration);
+            }
+            
+            // Update the voltage inputs to reflect the calculated voltage
+            voltageSecondaryInput.value = currentVoltage.toFixed(1);
+            updatePercentageFromVoltage();
+            
+            // Update simulation if in ramp mode
+            if (currentVoltageMode === 'ramp') {
+                runSimulation();
+            }
+        }
+        
+        // Initialize timers
+        function initializeTimers() {
+            // Reset any existing timers
+            resetTimers();
+            
+            // Get timer elements
+            const uTimerProgress = document.querySelector('#u-stage-timer .timer-progress-bar');
+            const uuTimerProgress = document.querySelector('#uu-stage-timer .timer-progress-bar');
+            const uTimerStatus = document.querySelector('#u-stage-timer .timer-status');
+            const uuTimerStatus = document.querySelector('#uu-stage-timer .timer-status');
+            const uTimerIcon = document.querySelector('#u-stage-timer .timer-icon');
+            const uuTimerIcon = document.querySelector('#uu-stage-timer .timer-icon');
+            
+            // Reset timer displays
+            uTimerProgress.style.width = '0%';
+            uuTimerProgress.style.width = '0%';
+            uTimerStatus.textContent = 'INACTIVE';
+            uTimerStatus.className = 'timer-status inactive';
+            uTimerIcon.className = 'timer-icon u-stage inactive';
+            uuTimerStatus.textContent = 'INACTIVE';
+            uuTimerStatus.className = 'timer-status inactive';
+            uuTimerIcon.className = 'timer-icon uu-stage inactive';
+            
+            // Hide trip command
+            document.getElementById('trip-command-container').style.display = 'none';
+            tripCommandIssued = false;
+        }
+        
+        // Reset all timers
+        function resetTimers() {
+            if (uStageTimerInterval) {
+                clearInterval(uStageTimerInterval);
+                uStageTimerInterval = null;
+            }
+            
+            if (uuStageTimerInterval) {
+                clearInterval(uuStageTimerInterval);
+                uuStageTimerInterval = null;
+            }
+            
+            uStageStartTime = 0;
+            uuStageStartTime = 0;
+        }
+        
+        // Start U> stage timer
+        function startUStageTimer() {
+            if (uStageTimerInterval) return; // Timer already running
+            
+            const delay = parseFloat(tuDelaySetting.value);
+            uStageStartTime = Date.now();
+            
+            const uTimerProgress = document.querySelector('#u-stage-timer .timer-progress-bar');
+            const uTimerStatus = document.querySelector('#u-stage-timer .timer-status');
+            const uTimerIcon = document.querySelector('#u-stage-timer .timer-icon');
+            
+            // Update timer display
+            uTimerStatus.textContent = 'COUNTING';
+            uTimerStatus.className = 'timer-status counting';
+            uTimerIcon.className = 'timer-icon u-stage';
+            
+            uStageTimerInterval = setInterval(() => {
+                const elapsed = (Date.now() - uStageStartTime) / 1000;
+                const remaining = Math.max(0, delay - elapsed);
+                
+                uTimerProgress.style.width = `${(elapsed / delay) * 100}%`;
+                
+                if (remaining <= 0) {
+                    clearInterval(uStageTimerInterval);
+                    uStageTimerInterval = null;
+                    uTimerStatus.textContent = 'TRIPPED';
+                    uTimerStatus.className = 'timer-status tripped';
+                    issueTripCommand('U> Stage');
+                }
+            }, 50); // Update every 50ms for smooth animation
+        }
+        
+        // Start U>> stage timer
+        function startUUStageTimer() {
+            if (uuStageTimerInterval) return; // Timer already running
+            
+            const delay = parseFloat(tuuDelaySetting.value);
+            uuStageStartTime = Date.now();
+            
+            const uuTimerProgress = document.querySelector('#uu-stage-timer .timer-progress-bar');
+            const uuTimerStatus = document.querySelector('#uu-stage-timer .timer-status');
+            const uuTimerIcon = document.querySelector('#uu-stage-timer .timer-icon');
+            
+            // Update timer display
+            uuTimerStatus.textContent = 'COUNTING';
+            uuTimerStatus.className = 'timer-status counting';
+            uuTimerIcon.className = 'timer-icon uu-stage';
+            
+            uuStageTimerInterval = setInterval(() => {
+                const elapsed = (Date.now() - uuStageStartTime) / 1000;
+                const remaining = Math.max(0, delay - elapsed);
+                
+                uuTimerProgress.style.width = `${(elapsed / delay) * 100}%`;
+                
+                if (remaining <= 0) {
+                    clearInterval(uuStageTimerInterval);
+                    uuStageTimerInterval = null;
+                    uuTimerStatus.textContent = 'TRIPPED';
+                    uuTimerStatus.className = 'timer-status tripped';
+                    issueTripCommand('U>> Stage');
+                }
+            }, 50); // Update every 50ms for smooth animation
+        }
+        
+        // Stop U> stage timer
+        function stopUStageTimer() {
+            if (uStageTimerInterval) {
+                clearInterval(uStageTimerInterval);
+                uStageTimerInterval = null;
+                
+                const uTimerStatus = document.querySelector('#u-stage-timer .timer-status');
+                const uTimerIcon = document.querySelector('#u-stage-timer .timer-icon');
+                const uTimerProgress = document.querySelector('#u-stage-timer .timer-progress-bar');
+                
+                uTimerStatus.textContent = 'INACTIVE';
+                uTimerStatus.className = 'timer-status inactive';
+                uTimerIcon.className = 'timer-icon u-stage inactive';
+                uTimerProgress.style.width = '0%';
+            }
+        }
+        
+        // Stop U>> stage timer
+        function stopUUStageTimer() {
+            if (uuStageTimerInterval) {
+                clearInterval(uuStageTimerInterval);
+                uuStageTimerInterval = null;
+                
+                const uuTimerStatus = document.querySelector('#uu-stage-timer .timer-status');
+                const uuTimerIcon = document.querySelector('#uu-stage-timer .timer-icon');
+                const uuTimerProgress = document.querySelector('#uu-stage-timer .timer-progress-bar');
+                
+                uuTimerStatus.textContent = 'INACTIVE';
+                uuTimerStatus.className = 'timer-status inactive';
+                uuTimerIcon.className = 'timer-icon uu-stage inactive';
+                uuTimerProgress.style.width = '0%';
+            }
+        }
+        
+        // Issue trip command
+        function issueTripCommand(stage) {
+            if (tripCommandIssued) return; // Only issue one trip command
+            
+            tripCommandIssued = true;
+            
+            const tripContainer = document.getElementById('trip-command-container');
+            tripContainer.innerHTML = `
+                <div class="trip-command">
+                    <h4><i class="fas fa-exclamation-triangle"></i> TRIP COMMAND ISSUED</h4>
+                    <p>${stage} operated after ${stage === 'U> Stage' ? tuDelaySetting.value : tuuDelaySetting.value} seconds</p>
+                    <p>Generator protection operated - Circuit breaker should open</p>
+                </div>
+            `;
+            tripContainer.style.display = 'block';
+            
+            // Stop all timers
+            resetTimers();
+            
+            // Update simulation results
+            updateSimulationResults(true, stage);
+        }
+        
+        // Update system constants when configuration changes
+        function updateSystemConstants() {
+            USM = parseFloat(usmInput.value);
+            UNVT_PRIM = parseFloat(unvtPrimInput.value);
+            UNVT_SEC = parseFloat(unvtSecInput.value);
+            NOMINAL_VOLTAGE = UNVT_SEC;
+            
+            // Update calculations display
+            updateCalculations();
+            
+            // Update simulation inputs to reflect new nominal voltage
+            updateVoltageFromPercentage();
+            updateUPickupFromPercentage();
+            updateUUPickupFromPercentage();
+            
+            // Update ramp visualization if in ramp mode
+            if (currentVoltageMode === 'ramp') {
+                updateRampVisualization();
+            }
+        }
+        
+        // Update calculations display
+        function updateCalculations() {
+            // CORRECTED CALCULATION FORMULA
+            // First convert USM from kV to V, then apply the formula
+            const usmVolts = USM * 1000; // Convert kV to V
+            
+            // U> = (1.15 × USM × UNVT_SEC) / UNVT_PRIM
+            const uStageSecondary = (1.15 * usmVolts * UNVT_SEC) / UNVT_PRIM;
+            
+            // U>> = (1.30 × USM × UNVT_SEC) / UNVT_PRIM
+            const uuStageSecondary = (1.30 * usmVolts * UNVT_SEC) / UNVT_PRIM;
+            
+            document.getElementById('u-stage-calculation').innerHTML = `
+                U> = (1.15 × U<sub>SM</sub> × U<sub>NVT sec</sub>) / U<sub>NVT prim</sub><br>
+                U> = (1.15 × ${USM} kV × ${UNVT_SEC} V) / ${UNVT_PRIM} V<br>
+                U> = (1.15 × ${usmVolts} V × ${UNVT_SEC} V) / ${UNVT_PRIM} V = ${uStageSecondary.toFixed(1)} V secondary
+            `;
+            
+            document.getElementById('uu-stage-calculation').innerHTML = `
+                U>> = (1.30 × U<sub>SM</sub> × U<sub>NVT sec</sub>) / U<sub>NVT prim</sub><br>
+                U>> = (1.30 × ${USM} kV × ${UNVT_SEC} V) / ${UNVT_PRIM} V<br>
+                U>> = (1.30 × ${usmVolts} V × ${UNVT_SEC} V) / ${UNVT_PRIM} V = ${uuStageSecondary.toFixed(1)} V secondary
+            `;
+            
+            // Update the pickup values to match the corrected calculations
+            uPickupSetting.value = uStageSecondary.toFixed(1);
+            uuPickupSetting.value = uuStageSecondary.toFixed(1);
+            
+            // Update percentage displays
+            updateUPickupFromPercentage();
+            updateUUPickupFromPercentage();
+            
+            // Update ramp visualization if in ramp mode
+            if (currentVoltageMode === 'ramp') {
+                updateRampVisualization();
+            }
+        }
+        
+        // Update voltage values based on percentage
+        function updateVoltageFromPercentage() {
+            const percentage = parseFloat(voltagePercentageInput.value);
+            const voltage = (percentage / 100) * NOMINAL_VOLTAGE;
+            voltageSecondaryInput.value = voltage.toFixed(1);
+            voltagePercentageValue.textContent = `${percentage}% (${voltage.toFixed(1)} V)`;
+            voltageSlider.value = percentage;
+        }
+        
+        // Update voltage percentage based on direct voltage input
+        function updatePercentageFromVoltage() {
+            const voltage = parseFloat(voltageSecondaryInput.value);
+            const percentage = (voltage / NOMINAL_VOLTAGE) * 100;
+            voltagePercentageInput.value = percentage.toFixed(1);
+            voltagePercentageValue.textContent = `${percentage.toFixed(1)}% (${voltage.toFixed(1)} V)`;
+            voltageSlider.value = percentage.toFixed(1);
+        }
+        
+        // Update U> pickup values
+        function updateUPickupFromPercentage() {
+            const percentage = parseFloat(uPickupPercentageInput.value);
+            const voltage = (percentage / 100) * NOMINAL_VOLTAGE;
+            uPickupValue.textContent = `${percentage}% (${voltage.toFixed(1)} V)`;
+            uPickupSlider.value = percentage;
+            uPickupSetting.value = voltage.toFixed(1);
+            
+            // Update ramp visualization if in ramp mode
+            if (currentVoltageMode === 'ramp') {
+                updateRampVisualization();
+            }
+        }
+        
+        // Update U>> pickup values
+        function updateUUPickupFromPercentage() {
+            const percentage = parseFloat(uuPickupPercentageInput.value);
+            const voltage = (percentage / 100) * NOMINAL_VOLTAGE;
+            uuPickupValue.textContent = `${percentage}% (${voltage.toFixed(1)} V)`;
+            uuPickupSlider.value = percentage;
+            uuPickupSetting.value = voltage.toFixed(1);
+            
+            // Update ramp visualization if in ramp mode
+            if (currentVoltageMode === 'ramp') {
+                updateRampVisualization();
+            }
+        }
+        
+        // Update percentages from direct voltage inputs
+        function updatePercentagesFromVoltageInputs() {
+            const uVoltage = parseFloat(uPickupSetting.value);
+            const uuVoltage = parseFloat(uuPickupSetting.value);
+            
+            const uPercentage = (uVoltage / NOMINAL_VOLTAGE) * 100;
+            const uuPercentage = (uuVoltage / NOMINAL_VOLTAGE) * 100;
+            
+            uPickupPercentageInput.value = uPercentage.toFixed(1);
+            uuPickupPercentageInput.value = uuPercentage.toFixed(1);
+            
+            updateUPickupFromPercentage();
+            updateUUPickupFromPercentage();
+        }
+        
+        // Reset to default values
+        function resetToDefaults() {
+            if (confirm('Reset all settings to default values?')) {
+                // Reset timers first
+                resetTimers();
+                initializeTimers();
+                
+                // System Configuration
+                usmInput.value = 15.75;
+                unvtPrimInput.value = 15700;
+                unvtSecInput.value = 110;
+                deltaUsmInput.value = 5;
+                
+                // Protection Settings
+                overvoltageSetting.value = 'ON';
+                tuDelaySetting.value = 3.00;
+                tuuDelaySetting.value = 0.75;
+                doutRatio.value = 0.95;
+                
+                // Simulation Inputs
+                voltagePercentageInput.value = 100;
+                
+                // Ramp Settings
+                rampStartVoltageInput.value = 110.0;
+                rampEndVoltageInput.value = 130.0;
+                rampDurationInput.value = 5.0;
+                rampCurrentTimeInput.value = 0;
+                rampTimeSlider.value = 0;
+                
+                // Set mode to steady
+                setVoltageMode('steady');
+                
+                // Update all calculations and run simulation
+                updateSystemConstants();
+                updateVoltageFromPercentage();
+                updateUPickupFromPercentage();
+                updateUUPickupFromPercentage();
+                runSimulation();
+                
+                alert('All settings have been reset to default values.');
+            }
+        }
+        
+        // Update protection status cards
+        function updateProtectionStatus(voltage, uPickup, uuPickup) {
+            protectionStatusContainer.innerHTML = '';
+            
+            // U> Stage Status
+            const uStageCard = document.createElement('div');
+            uStageCard.className = 'status-card';
+            
+            if (voltage >= uPickup) {
+                if (uStageTimerInterval) {
+                    uStageCard.classList.add('pending');
+                    uStageCard.innerHTML = `
+                        <div class="status-indicator-large" style="background-color: #2196f3;"></div>
+                        <h4>U> Stage</h4>
+                        <p>COUNTING</p>
+                    `;
+                } else if (tripCommandIssued) {
+                    uStageCard.classList.add('active');
+                    uStageCard.innerHTML = `
+                        <div class="status-indicator-large status-active"></div>
+                        <h4>U> Stage</h4>
+                        <p>TRIPPED</p>
+                    `;
+                } else {
+                    uStageCard.classList.add('pending');
+                    uStageCard.innerHTML = `
+                        <div class="status-indicator-large" style="background-color: #ff9800;"></div>
+                        <h4>U> Stage</h4>
+                        <p>PICKED UP</p>
+                    `;
+                }
+            } else {
+                uStageCard.classList.add('inactive');
+                uStageCard.innerHTML = `
+                    <div class="status-indicator-large status-inactive"></div>
+                    <h4>U> Stage</h4>
+                    <p>INACTIVE</p>
+                `;
+            }
+            
+            // U>> Stage Status
+            const uuStageCard = document.createElement('div');
+            uuStageCard.className = 'status-card';
+            
+            if (voltage >= uuPickup) {
+                if (uuStageTimerInterval) {
+                    uuStageCard.classList.add('pending');
+                    uuStageCard.innerHTML = `
+                        <div class="status-indicator-large" style="background-color: #2196f3;"></div>
+                        <h4>U>> Stage</h4>
+                        <p>COUNTING</p>
+                    `;
+                } else if (tripCommandIssued) {
+                    uuStageCard.classList.add('active');
+                    uuStageCard.innerHTML = `
+                        <div class="status-indicator-large status-active"></div>
+                        <h4>U>> Stage</h4>
+                        <p>TRIPPED</p>
+                    `;
+                } else {
+                    uuStageCard.classList.add('pending');
+                    uuStageCard.innerHTML = `
+                        <div class="status-indicator-large" style="background-color: #ff9800;"></div>
+                        <h4>U>> Stage</h4>
+                        <p>PICKED UP</p>
+                    `;
+                }
+            } else {
+                uuStageCard.classList.add('inactive');
+                uuStageCard.innerHTML = `
+                    <div class="status-indicator-large status-inactive"></div>
+                    <h4>U>> Stage</h4>
+                    <p>INACTIVE</p>
+                `;
+            }
+            
+            protectionStatusContainer.appendChild(uStageCard);
+            protectionStatusContainer.appendChild(uuStageCard);
+        }
+        
+        // Update time delay visualization
+        function updateTimeDelayVisualization() {
+            const uProgress = document.getElementById('u-progress');
+            const uuProgress = document.getElementById('uu-progress');
+            
+            // Update labels
+            document.querySelector('.delay-progress:nth-child(2) span').textContent = `U> Stage (${tuDelaySetting.value}s)`;
+            document.querySelector('.delay-progress:nth-child(3) span').textContent = `U>> Stage (${tuuDelaySetting.value}s)`;
+            
+            // Update progress bars based on timer status
+            if (uStageTimerInterval) {
+                const elapsed = (Date.now() - uStageStartTime) / 1000;
+                const delay = parseFloat(tuDelaySetting.value);
+                const progressPercent = Math.min((elapsed / delay) * 100, 100);
+                uProgress.style.width = `${progressPercent}%`;
+                
+                if (progressPercent >= 100) {
+                    uProgress.style.background = 'linear-gradient(to right, #f44336, #d32f2f)';
+                } else if (progressPercent >= 80) {
+                    uProgress.style.background = 'linear-gradient(to right, #ff9800, #f57c00)';
+                } else {
+                    uProgress.style.background = 'linear-gradient(to right, var(--siemens-blue), var(--siemens-dark-blue))';
+                }
+            } else {
+                uProgress.style.width = '0%';
+                uProgress.style.background = 'linear-gradient(to right, var(--siemens-blue), var(--siemens-dark-blue))';
+            }
+            
+            if (uuStageTimerInterval) {
+                const elapsed = (Date.now() - uuStageStartTime) / 1000;
+                const delay = parseFloat(tuuDelaySetting.value);
+                const progressPercent = Math.min((elapsed / delay) * 100, 100);
+                uuProgress.style.width = `${progressPercent}%`;
+                
+                if (progressPercent >= 100) {
+                    uuProgress.style.background = 'linear-gradient(to right, #f44336, #d32f2f)';
+                } else if (progressPercent >= 80) {
+                    uuProgress.style.background = 'linear-gradient(to right, #ff9800, #f57c00)';
+                } else {
+                    uuProgress.style.background = 'linear-gradient(to right, var(--siemens-blue), var(--siemens-dark-blue))';
+                }
+            } else {
+                uuProgress.style.width = '0%';
+                uuProgress.style.background = 'linear-gradient(to right, var(--siemens-blue), var(--siemens-dark-blue))';
+            }
+        }
+        
+        // Update simulation results
+        function updateSimulationResults(tripped = false, trippedStage = '') {
+            const voltage = parseFloat(voltageSecondaryInput.value);
+            const uPickup = parseFloat(uPickupSetting.value);
+            const uuPickup = parseFloat(uuPickupSetting.value);
+            const protectionEnabled = overvoltageSetting.value === 'ON';
+            
+            // Clear previous results
+            resultsContainer.innerHTML = '';
+            
+            if (!protectionEnabled) {
+                const disabledAlert = document.createElement('div');
+                disabledAlert.className = 'warning-alert';
+                disabledAlert.innerHTML = `
+                    <h4>Protection Disabled</h4>
+                    <p>Overvoltage protection is currently set to <strong>${overvoltageSetting.value}</strong>. Enable protection to see simulation results.</p>
+                `;
+                resultsContainer.appendChild(disabledAlert);
+                return;
+            }
+            
+            // Create results display
+            const voltageInfo = document.createElement('div');
+            voltageInfo.className = 'calculation-item';
+            
+            // Add voltage mode info if in ramp mode
+            let voltageModeInfo = '';
+            if (currentVoltageMode === 'ramp') {
+                const startVoltage = parseFloat(rampStartVoltageInput.value);
+                const endVoltage = parseFloat(rampEndVoltageInput.value);
+                const rampDuration = parseFloat(rampDurationInput.value);
+                const currentTime = parseFloat(rampCurrentTimeInput.value);
+                
+                voltageModeInfo = `
+                    <p><strong>Voltage Mode:</strong> Ramp (${startVoltage.toFixed(1)}V to ${endVoltage.toFixed(1)}V over ${rampDuration.toFixed(1)}s)</p>
+                    <p><strong>Current Time:</strong> ${currentTime.toFixed(1)}s</p>
+                `;
+            } else {
+                voltageModeInfo = `<p><strong>Voltage Mode:</strong> Steady</p>`;
+            }
+            
+            // Calculate primary voltage
+            const primaryVoltage = voltage * (UNVT_PRIM / UNVT_SEC) / 1000; // Convert to kV
+            
+            voltageInfo.innerHTML = `
+                ${voltageModeInfo}
+                <p><strong>Measured Voltage:</strong> ${voltage.toFixed(1)} V secondary (${primaryVoltage.toFixed(2)} kV primary)</p>
+                <p><strong>U> Pickup:</strong> ${uPickup.toFixed(1)} V</p>
+                <p><strong>U>> Pickup:</strong> ${uuPickup.toFixed(1)} V</p>
+            `;
+            resultsContainer.appendChild(voltageInfo);
+            
+            // Check U>> stage
+            const uuStage = document.createElement('div');
+            uuStage.className = 'calculation-item';
+            
+            if (voltage >= uuPickup) {
+                uuStage.innerHTML = `
+                    <p><span class="status-indicator status-active"></span> <strong>U>> Stage:</strong> PICKED UP (${voltage.toFixed(1)}V ≥ ${uuPickup.toFixed(1)}V)</p>
+                `;
+                
+                if (tripped && trippedStage === 'U>> Stage') {
+                    uuStage.innerHTML += `
+                        <div class="trip-alert">
+                            <strong>TRIP:</strong> U>> stage operated after ${tuuDelaySetting.value} seconds
+                        </div>
+                    `;
+                } else if (uuStageTimerInterval) {
+                    uuStage.innerHTML += `
+                        <div class="warning-alert">
+                            <strong>U>> Stage:</strong> Timer running
+                        </div>
+                    `;
+                } else {
+                    uuStage.innerHTML += `
+                        <div class="warning-alert">
+                            <strong>U>> Stage:</strong> Voltage above pickup - timer will start
+                        </div>
+                    `;
+                }
+            } else {
+                uuStage.innerHTML = `
+                    <p><span class="status-indicator status-inactive"></span> <strong>U>> Stage:</strong> Not picked up (${voltage.toFixed(1)}V < ${uuPickup.toFixed(1)}V)</p>
+                `;
+            }
+            
+            resultsContainer.appendChild(uuStage);
+            
+            // Check U> stage
+            const uStage = document.createElement('div');
+            uStage.className = 'calculation-item';
+            
+            if (voltage >= uPickup) {
+                uStage.innerHTML = `
+                    <p><span class="status-indicator status-active"></span> <strong>U> Stage:</strong> PICKED UP (${voltage.toFixed(1)}V ≥ ${uPickup.toFixed(1)}V)</p>
+                `;
+                
+                if (tripped && trippedStage === 'U> Stage') {
+                    uStage.innerHTML += `
+                        <div class="trip-alert">
+                            <strong>TRIP:</strong> U> stage operated after ${tuDelaySetting.value} seconds
+                        </div>
+                    `;
+                } else if (uStageTimerInterval) {
+                    uStage.innerHTML += `
+                        <div class="warning-alert">
+                            <strong>U> Stage:</strong> Timer running
+                        </div>
+                    `;
+                } else {
+                    uStage.innerHTML += `
+                        <div class="warning-alert">
+                            <strong>U> Stage:</strong> Voltage above pickup - timer will start
+                        </div>
+                    `;
+                }
+            } else {
+                uStage.innerHTML = `
+                    <p><span class="status-indicator status-inactive"></span> <strong>U> Stage:</strong> Not picked up (${voltage.toFixed(1)}V < ${uPickup.toFixed(1)}V)</p>
+                `;
+            }
+            
+            resultsContainer.appendChild(uStage);
+            
+            // Add summary
+            const summary = document.createElement('div');
+            summary.className = 'summary-box';
+            
+            if (tripped) {
+                summary.classList.add('trip');
+                summary.innerHTML = `<h4>CONCLUSION: TRIP COMMAND ISSUED</h4><p>Generator protection operated - Circuit breaker should open</p>`;
+            } else if (voltage >= uuPickup || voltage >= uPickup) {
+                summary.classList.add('warning');
+                summary.innerHTML = `<h4>CONCLUSION: PROTECTION PICKED UP</h4><p>Protection elements are activated - timers are running</p>`;
+            } else {
+                summary.classList.add('normal');
+                summary.innerHTML = `<h4>CONCLUSION: NORMAL OPERATION</h4><p>No protection operation - Voltage within acceptable limits</p>`;
+            }
+            
+            resultsContainer.appendChild(summary);
+        }
+        
+        // Simulation function
+        function runSimulation() {
+            const voltage = parseFloat(voltageSecondaryInput.value);
+            const uPickup = parseFloat(uPickupSetting.value);
+            const uuPickup = parseFloat(uuPickupSetting.value);
+            const protectionEnabled = overvoltageSetting.value === 'ON';
+            
+            // Initialize timers on first run
+            if (!uStageTimerInterval && !uuStageTimerInterval && !tripCommandIssued) {
+                initializeTimers();
+            }
+            
+            // Update protection status
+            updateProtectionStatus(voltage, uPickup, uuPickup);
+            
+            // Update time delay visualization
+            updateTimeDelayVisualization();
+            
+            // Handle timer logic based on voltage and pickup settings
+            if (protectionEnabled && !tripCommandIssued) {
+                // U>> stage logic
+                if (voltage >= uuPickup) {
+                    if (!uuStageTimerInterval) {
+                        startUUStageTimer();
+                    }
+                } else {
+                    stopUUStageTimer();
+                }
+                
+                // U> stage logic
+                if (voltage >= uPickup) {
+                    if (!uStageTimerInterval) {
+                        startUStageTimer();
+                    }
+                } else {
+                    stopUStageTimer();
+                }
+            } else {
+                // Protection disabled or trip already issued
+                resetTimers();
+            }
+            
+            // Update simulation results
+            updateSimulationResults();
+        }
+        
+        // Event listeners for voltage inputs
+        voltagePercentageInput.addEventListener('input', updateVoltageFromPercentage);
+        voltageSlider.addEventListener('input', function() {
+            voltagePercentageInput.value = this.value;
+            updateVoltageFromPercentage();
+            runSimulation();
+        });
+        voltageSecondaryInput.addEventListener('input', function() {
+            updatePercentageFromVoltage();
+            runSimulation();
+        });
+        
+        // Event listeners for U> pickup inputs
+        uPickupPercentageInput.addEventListener('input', updateUPickupFromPercentage);
+        uPickupSlider.addEventListener('input', function() {
+            uPickupPercentageInput.value = this.value;
+            updateUPickupFromPercentage();
+        });
+        uPickupSetting.addEventListener('input', updatePercentagesFromVoltageInputs);
+        
+        // Event listeners for U>> pickup inputs
+        uuPickupPercentageInput.addEventListener('input', updateUUPickupFromPercentage);
+        uuPickupSlider.addEventListener('input', function() {
+            uuPickupPercentageInput.value = this.value;
+            updateUUPickupFromPercentage();
+        });
+        uuPickupSetting.addEventListener('input', updatePercentagesFromVoltageInputs);
+        
+        // Event listeners for system configuration inputs
+        usmInput.addEventListener('input', updateSystemConstants);
+        unvtPrimInput.addEventListener('input', updateSystemConstants);
+        unvtSecInput.addEventListener('input', updateSystemConstants);
+        deltaUsmInput.addEventListener('input', updateSystemConstants);
+        
+        // Event listeners for protection settings inputs
+        tuDelaySetting.addEventListener('input', function() {
+            runSimulation();
+        });
+        tuuDelaySetting.addEventListener('input', function() {
+            runSimulation();
+        });
+        overvoltageSetting.addEventListener('change', runSimulation);
+        
+        // Event listeners for action buttons
+        simulateBtn.addEventListener('click', runSimulation);
+        resetBtn.addEventListener('click', resetToDefaults);
+        
+        // Update ramp visualization on window resize
+        window.addEventListener('resize', function() {
+            if (currentVoltageMode === 'ramp') {
+                updateRampVisualization();
+            }
+        });
+    </script>
+</body>
+</html>
